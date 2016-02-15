@@ -1,13 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
        http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://camel.apache.org/schema/spring
        http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-    <camelContext trace="false" xmlns="http://camel.apache.org/schema/spring">
-        <propertyPlaceholder id="properties" location="fabric8/route.properties"/>
-    </camelContext>
+	<bean id="redeliveryPolicy" class="org.apache.camel.processor.RedeliveryPolicy">
+		<property name="maximumRedeliveries" value="1" />
+	</bean>
+
+	<camelContext trace="false"
+		xmlns="http://camel.apache.org/schema/spring">
+		<propertyPlaceholder id="properties" location="fabric8/route.properties" />
+
+		<endpoint id="csv2json"
+			uri="dozer:csv2json?sourceModel=org.acme.Customer&amp;targetModel=org.globex.Account&amp;marshalId=json&amp;unmarshalId=csv&amp;mappingFile=transformation.xml" />
+
+		<dataFormats>
+			<bindy id="csv" type="Csv" classType="org.acme.Customer" />
+			<json id="json" library="Jackson" />
+		</dataFormats>
+
+		<onException redeliveryPolicyRef="redeliveryPolicy">
+			<exception>java.lang.IllegalArgumentException</exception>
+			<handled>
+				<constant>true</constant>
+			</handled>
+			<to
+				uri="{{fileError}}?fileName=account-${property.CamelSplitIndex}.json" />
+		</onException>
+
+		<route id="readCustomerData">
+			<from uri="{{fileInput}}?fileName=customers.csv&amp;noop=true" />
+
+			<split>
+				<tokenize token="\n" />
+				<to uri="direct:generateAccounts" />
+			</split>
+
+		</route>
+
+		<route id="processCustomerData">
+			<from uri="direct:generateAccounts" />
+			<to uri="csv2json" />
+			<to
+				uri="{{fileOutput}}?fileName=csv-record-${date:now:yyyyMMdd}-${property.CamelSplitIndex}.txt" />
+		</route>
+
+	</camelContext>
 </beans>
