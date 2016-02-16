@@ -1,14 +1,15 @@
 package org.globex.usecase.service;
 
-import org.globex.globex.Account;
-import org.globex.globex.CorporateAccount;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+
+import org.globex.Account;
+import org.globex.CorporateAccount;
 
 @WebService(endpointInterface = "org.globex.usecase.service.CustomerWS")
 public class CustomerWSImpl implements CustomerWS {
@@ -38,8 +39,8 @@ public class CustomerWSImpl implements CustomerWS {
     @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
     public CorporateAccount updateAccount(Account account) {
         CorporateAccount ca = new CorporateAccount();
-
-
+        ca.setId(genRandom());
+        ca.setSalesContact(getRandomSales(sales));
         return ca;
     }
 

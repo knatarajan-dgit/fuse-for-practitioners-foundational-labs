@@ -1,14 +1,14 @@
 package org.globex.usecase;
 
-import org.apache.camel.Body;
-import org.apache.camel.Exchange;
-import org.globex.globex.Account;
-
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.camel.Body;
+import org.apache.camel.Exchange;
+import org.globex.Account;
 
 public class ProcessorBean {
 

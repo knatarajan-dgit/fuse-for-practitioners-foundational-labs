@@ -1,10 +1,10 @@
 package org.globex.usecase.service;
 
-import org.globex.globex.Account;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+
+import org.globex.Account;
 
 @Path("/customerservice/")
 public interface CustomerRest {

@@ -17,8 +17,20 @@ public class CustomerRestImpl implements CustomerRest {
     public Account enrich(Account account) {
         Company company = account.getCompany();
         String region = company.getGeo();
-
-
+        switch(region) {
+	        case "na":
+	        	company.setGeo(NA_REGION);
+	        	break;
+	        case "SA":
+	        	company.setGeo(SA_REGION);
+	        	break;
+	        case "WE":
+	        	company.setGeo(WE_REGION);
+	        	break;
+	        case "EU":
+	        	company.setGeo(EAST_REGION);
+	        	break;
+        }
         return account;
     }
 }
